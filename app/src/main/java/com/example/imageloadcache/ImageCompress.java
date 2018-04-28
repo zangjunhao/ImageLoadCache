@@ -12,7 +12,7 @@ import java.io.FileDescriptor;
  */
 
     //图片压缩
-    //分别从资源文件 FileDescriptor进行加载
+    //分别从资源 FileDescriptor进行加载
     //这里要明白的options.inJustDecodeBounds的ture代表option只测不加载而false就代表要加载
 public class ImageCompress {
     private static final String Tag="ImageCompress";
