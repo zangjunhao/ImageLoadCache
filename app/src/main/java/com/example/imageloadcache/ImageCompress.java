@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.FileDescriptor;
+import java.io.InputStream;
 
 /**
  * Created by 67698 on 2018/4/27.
@@ -36,6 +37,15 @@ public class ImageCompress {
         options.inSampleSize=CalculateInsampleSize(options,reqWidth,reqHeight);
         options.inJustDecodeBounds=false;
         return BitmapFactory.decodeFileDescriptor(fileDescriptor,null,options);
+    }
+    public Bitmap decodeSampledBitmapFromStream(InputStream inputStream, int reqWidth, int reqHeight)
+    {
+        final  BitmapFactory.Options options=new BitmapFactory.Options();
+        options.inJustDecodeBounds=true;
+        BitmapFactory.decodeStream(inputStream,null,options);
+        options.inSampleSize=CalculateInsampleSize(options,reqWidth,reqHeight);
+        options.inJustDecodeBounds=false;
+        return BitmapFactory.decodeStream(inputStream,null,options);
     }
     //计算采样率
     public int CalculateInsampleSize(BitmapFactory.Options options,int reqWidth,int reqHeight)
