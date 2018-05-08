@@ -21,6 +21,6 @@
        return BitmapFactory.decodeStream(inputstream, null, options);  
         }`
    ， 会发现返回是null，因为inputstream只能用一次，之前测的时候用了一次，所以后inputsteam就没有了，处理方法是将流转化陈byte数组就可以重复用了
-- 3.将自动clear本地缓存删除了，需要手动设置清除缓存了    
+- 3.将自动clear本地缓存删除了，需要手动设置清除缓存了（因为一直出现未知错误    
 ## 感悟
 ### 我是真的菜
