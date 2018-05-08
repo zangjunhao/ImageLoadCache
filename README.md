@@ -20,7 +20,7 @@
         options.inJustDecodeBounds = false;  
        return BitmapFactory.decodeStream(inputstream, null, options);  
         }`
-    会发现返回是null，因为inputstream只能用一次，之前测的时候用了一次，所以后inputsteam就没有了
+   ， 会发现返回是null，因为inputstream只能用一次，之前测的时候用了一次，所以后inputsteam就没有了，处理方法是将流转化陈byte数组就可以重复用了
     
 ## 感悟
 ### 我是真的菜
