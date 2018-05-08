@@ -12,7 +12,7 @@
 ## 修改——2018.5.8
 - 1.本地加载时设置判断再存入内存
 - 2.图片压缩中对流的处理，因为如果就是平时的代码 
-     ` {
+-    ` {
         BitmapFactory.Options options = new BitmapFactory.Options();  
         options.inJustDecodeBounds = true;  
         BitmapFactory.decodeStream(inputstream, null, options);  
