@@ -12,7 +12,7 @@ import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
 
-import com.jakewharton.disklrucache.DiskLruCache;
+
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -48,7 +48,7 @@ public class ImageLoader {
     private static final long DISK_CACHE_SIZE=1024*1024*50;//最大缓存为50MB(因为内存的基本单位是b)
     private static final int IO_BUFFER_SIZE =8*1024;//流内最大缓存量
     private static final int DISK_CACHE_INDEX=0;//缓存指针
-    private boolean mIsDiskLruCacheCreated=false;//默认不打开磁盘存储
+
     private static final ThreadFactory sThreadFactory=new ThreadFactory() {//为后面线程池做准备
         private final AtomicInteger mcount=new AtomicInteger(1);//原子操作Integer,线程安全的Integer类
         @Override
@@ -168,12 +168,12 @@ public class ImageLoader {
         Runnable loadBitmapTask=new Runnable() {
             @Override
             public void run() {
-            Bitmap bitmap=loadBitmap(url,reqWidth,reqHeight);
-            if(bitmap!=null)
-            {
-                LoaderResult result=new LoaderResult(imageView,url,bitmap);
-                mMainHandler.obtainMessage(MESSAGE_RESULT,result).sendToTarget();
-            }
+                Bitmap bitmap=loadBitmap(url,reqWidth,reqHeight);
+                if(bitmap!=null)
+                {
+                    LoaderResult result=new LoaderResult(imageView,url,bitmap);
+                    mMainHandler.obtainMessage(MESSAGE_RESULT,result).sendToTarget();
+                }
             }
         };
         THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
@@ -190,25 +190,27 @@ public class ImageLoader {
         Log.d(TAG,"DISKCache");
         Bitmap bitmap=null;
         String imageFileName=DiskFile.toString()+File.separator+getMD5(url)+".png";
-        bitmap= BitmapFactory.decodeFile(imageFileName);
-        saveToMemoryCache(url,bitmap);
+        File file=new File(imageFileName);
+        if(file.exists()) bitmap= BitmapFactory.decodeFile(imageFileName);
+        if(bitmap!=null) saveToMemoryCache(url,bitmap);
         return bitmap;
     }
     private Bitmap loadBitmapFormHttp(String urll,int reqWidth,int reqHeight)
     {
         ImageCompress imageCompress=new ImageCompress();
-       if(Looper.myLooper()==Looper.getMainLooper()){
-         throw new RuntimeException("网络操作不能在UI线程上操作");
-       }
+        if(Looper.myLooper()==Looper.getMainLooper()){
+            throw new RuntimeException("网络操作不能在UI线程上操作");
+        }
         Bitmap bitmap=null;
         HttpURLConnection urlConnection=null;
-        BufferedInputStream bf=null;
+        InputStream inputStream=null;
         try{
-            final URL url=new URL(urll);
+            URL url=new URL(urll);
             urlConnection=(HttpURLConnection)url.openConnection();
-            bf=new BufferedInputStream(urlConnection.getInputStream());
-            bitmap=imageCompress.decodeSampledBitmapFromStream(bf,reqWidth,reqHeight);
-            saveToDisk(urll,bf,reqWidth,reqHeight);
+            inputStream=urlConnection.getInputStream();
+            bitmap=imageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
+            Log.d(TAG, "loadBitmapFormHttp: bitmap"+bitmap);
+            if(bitmap!=null) saveToDisk(urll,inputStream,reqWidth,reqHeight);
         }catch (final IOException e)
         {
             Log.e(TAG,"下图片的时候出现错误");
@@ -218,8 +220,8 @@ public class ImageLoader {
             {
                 urlConnection.disconnect();
             }
-            if(bf!=null) try {
-                bf.close();
+            if(inputStream!=null) try {
+                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -231,6 +233,7 @@ public class ImageLoader {
     {
         if(getBitmapFromMemoryCache(key)==null)
         {
+            Log.d(TAG, "saveToMemoryCache: key="+key);
             mMemoryCache.put(key,bitmap);
         }
     }
@@ -241,16 +244,15 @@ public class ImageLoader {
 
 
     public void saveToDisk(String imageurl, InputStream inputStream,int reqWidth,int reqHeight)//缓存到本地
-    {
-        String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".png";//.separator就是/或者\增加鲁棒性
+    {   long x=0;
+        String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".jpg";//.separator就是/或者\增加鲁棒性
+        //Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
         File file=new File(imageFileName);
         File[] files=DiskFile.listFiles();
-        long x=files.length;
-        if(x>DISK_CACHE_SIZE)clear();
         try {
             FileOutputStream fo=new FileOutputStream(file);
             Bitmap bitmap=mImageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
-            bitmap.compress(Bitmap.CompressFormat.PNG,100,fo);
+            if(bitmap!=null) bitmap.compress(Bitmap.CompressFormat.PNG,100,fo);
             try {
                 fo.flush();
                 fo.close();
