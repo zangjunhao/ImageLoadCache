@@ -30,5 +30,7 @@
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             }, 1);`
 - 如果不申请，本地缓存就无法用
+## 修改——2018.5.11
+- 对于本地缓存进行部分优化
 ## 感悟
 ### 我是真的菜
