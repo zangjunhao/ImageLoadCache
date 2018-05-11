@@ -52,9 +52,9 @@ public class ImageCompress {
             BitmapFactory.decodeStream(inputStream,null,options);
 
             options.inSampleSize = CalculateInsampleSize(options,reqWidth,reqHeight);
-            Log.d("难受呀卢员外", "decodeSampledBitmapFromStream: "+inputStream);
+            //Log.d("难受呀卢员外", "decodeSampledBitmapFromStream: "+inputStream);
             options.inJustDecodeBounds = false;
-            Log.d("难受呀卢员外", "decodeSampledBitmapFromStream_decode: "+BitmapFactory.decodeByteArray(date,0,date.length,options));
+           // Log.d("难受呀卢员外", "decodeSampledBitmapFromStream_decode: "+BitmapFactory.decodeByteArray(date,0,date.length,options));
             return BitmapFactory.decodeByteArray(date,0,date.length,options);
         } catch (IOException e) {
             e.printStackTrace();
