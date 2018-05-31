@@ -172,7 +172,7 @@ public class ImageLoader {
             @Override
             public void run() {
                 Bitmap bitmap=loadBitmap(url,reqWidth,reqHeight);
-                if(bitmap!=null)
+                if(bitmap!=null&&imageView.getTag().equals(url))
                 {
                     LoaderResult result=new LoaderResult(imageView,url,bitmap);
                     mMainHandler.obtainMessage(MESSAGE_RESULT,result).sendToTarget();
